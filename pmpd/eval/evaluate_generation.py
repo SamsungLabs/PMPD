@@ -344,7 +344,6 @@ def get_model_answers(
         for i in range(num_choices):
             torch.manual_seed(0)
             conv = get_conversation_template('claude-2')
-            # conv = get_conversation_template('vicuna')
             turns = []
             idxs = []
             new_tokens = []

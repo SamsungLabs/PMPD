@@ -1,21 +1,3 @@
-# This code is based on tatsu-lab/stanford_alpaca. Below is the original copyright:
-#
-#    Copyright 2023 Rohan Taori, Ishaan Gulrajani, Tianyi Zhang, Yann Dubois, Xuechen Li
-#
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#
-#        http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
-
-# Adapted from: https://github.com/lm-sys/FastChat/blob/main/fastchat/train/train.py
-
 from dataclasses import dataclass, field
 from tqdm import tqdm
 import pathlib
@@ -673,40 +655,6 @@ def train(params, config, dataset, precisions, all_layers):
                     eval_loss += criterion(pred, label).cpu().item()
             eval_loss /= len(eval_dataset)
             print(f"Epoch {epoch}, Validation Loss {eval_loss}", flush=True)
-    
-    # Determine the threshold based on F1 and precision-recall curve
-    # for (high_bit, low_bit), classifier in scheduler.classifiers.items():
-        # classifier.eval()
-        # eval_preds, eval_labels = [], []
-        # with torch.no_grad():
-        #     for data in eval_dataset:
-        #         past_key_values = data['input_ids']
-        #         labels = data['labels']
-        #         past_key = past_key_values[0]
-        #         past_value = past_key_values[1]
-        #         pred = classifier(past_key.cuda(), past_value.cuda())[0]
-        #         eval_preds.append(pred.cpu().item())
-        #         eval_labels.append(labels)
-
-        # calculate the best threshold using precision-recall curve
-        # precision, recall, thresholds = precision_recall_curve(eval_labels, eval_preds)
-        # f1_scores = np.where((precision + recall) == 0, 0, 2 * (precision * recall) / (precision + recall))
-        
-        # num_f1 = len(f1_scores)
-        # if num_f1 < 5:
-        #     classifier.threshold = sum(eval_preds) / len(eval_preds)
-        #     continue
-        # lower_bound = num_f1 // 5 * 2
-        # upper_bound = num_f1 // 5 * 3
-        # middle_f1 = f1_scores[lower_bound:upper_bound]
-        
-        # best_threshold_idx = np.argmax(f1_scores)
-        # best_threshold = thresholds[best_threshold_idx] 
-        # best_f1 = f1_scores[best_threshold_idx]
-        # classifier.threshold = best_threshold
-        # positive_preds = [pred for pred, label in zip(eval_preds, eval_labels) if label == 1]
-        # classifier.threshold = sum(positive_preds) / len(positive_preds)
-        # print(f"Best threshold for classifier {(high_bit, low_bit)}: {classifier.threshold}, F1: {best_f1}")
 
     return {'loss': eval_loss, 'status': STATUS_OK, 'model': scheduler.classifiers}
 

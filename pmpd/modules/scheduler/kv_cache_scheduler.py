@@ -97,16 +97,6 @@ class KVCacheClassifier(Module):
     # Convert key and value to the same dtype as query
     key = key.to(torch.float32).mean(dim=1)
     value = value.to(torch.float32).mean(dim=1)
-    # mean_k = key.mean(dim=1)
-    # mean_v = value.mean(dim=1)
-    # var_k = key.var(dim=1)
-    # var_v = value.var(dim=1)
-    # inp = torch.cat([mean_k, mean_v, var_k, var_v], dim=-1)
-    
-    # project = self.project.to(inp.device)
-    # logit = project(inp)
-    # ret = torch.softmax(logit, dim=-1)
-    # return ret
 
     # Expand query to match the batch size and add a dimension for time
     query = self.query.expand(B, -1, -1, -1).to(key.device)

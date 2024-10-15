@@ -41,31 +41,6 @@ def common_prefix_length(str1, str2):
   return i
 
 
-ANS_RE = re.compile(r"#### (\-?[0-9\.\,]+)")
-INVALID_ANS = "[invalid]"
-
-N_SHOT = 8
-COT_FLAG = True
-DEBUG = False
-ANSWER_TRIGGER = "The answer is"
-
-
-def extract_answer_from_output(completion):
-    match = ANS_RE.search(completion)
-    if match:
-        match_str = match.group(1).strip()
-        match_str = match_str.replace(",", "")
-        return match_str
-    else:
-        return INVALID_ANS
-
-
-def is_correct(model_answer, answer):
-    gt_answer = extract_answer_from_output(answer)
-    assert gt_answer != INVALID_ANS
-    return model_answer == gt_answer
-
-
 def extract_integer_string(answer):
     # remove ,
     answer = answer.replace(',', '')
@@ -122,13 +97,10 @@ def get_scores(input_files, bench_name, reference_data=None):
             # print(answer)
             correct += answer == d["pass_key"]
           elif bench_name == "gsm8k":
-            # n = extract_integer_string(parse(answer, 1))
-            # reference_answer = extract_integer_string(reference_data[i])
-            # if n is not None and (n == reference_answer or abs(float(n) - int(reference_answer)) < 1e-6):
-            #   correct += 1
-            n = extract_answer_from_output(parse(answer, 1))
-            reference_answer = extract_answer_from_output(reference_data[i])
-            correct += is_correct(n, reference_answer)
+            n = extract_integer_string(parse(answer, 1))
+            reference_answer = extract_integer_string(reference_data[i])
+            if n is not None and (n == reference_answer or abs(float(n) - int(reference_answer)) < 1e-6):
+              correct += 1
           elif bench_name == "IWSLT":
             summaries.append(answer)
             references.append(d["reference"])
