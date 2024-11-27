@@ -112,7 +112,6 @@ def infer_quant(input_ids, model, prefill_bit, max_steps=256, past_key_values=No
 def run_eval(
     model_path,
     model_id,
-    question_file,
     question_begin,
     question_end,
     answer_file,
@@ -195,9 +194,6 @@ def run_eval(
         questions = dataset['dialogue']
     else:
         raise ValueError("Unknown benchmark name")
-        
-    # random shuffle the questions to balance the loading
-    # random.shuffle(questions)
 
     # Split the question file into `num_gpus` files
     assert num_gpus_total % num_gpus_per_model == 0
@@ -636,13 +632,7 @@ if __name__ == "__main__":
 
         ray.init()
 
-    question_file = None
-    if args.answer_file:
-        answer_file = args.answer_file
-    else:
-        answer_file_name = args.model_id+"-temperature-"+str(args.temperature)+"-posterior_threshold-"+str(args.posterior_threshold)+"-posterior_alpha-"+str(args.posterior_alpha)+"-sampling-"+args.sampling
-        answer_file = f"data/{args.bench_name}/model_answer/{answer_file_name}.jsonl"
-
+    answer_file = args.answer_file
     if args.random_p is not None:
         args.random_p = [float(p) for p in args.random_p]
 
@@ -650,7 +640,6 @@ if __name__ == "__main__":
     run_eval(
         model_path=args.model_path,
         model_id=args.model_id,
-        question_file=question_file,
         question_begin=args.question_begin,
         question_end=args.question_end,
         answer_file=answer_file,

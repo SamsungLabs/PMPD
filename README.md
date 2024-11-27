@@ -15,6 +15,13 @@
 
 ## Installation
 
+Prerequisites:
+
+- Python 3.11
+- CUDA Toolkit 12 or higher
+- gcc-9 or highe
+
+
 Install dependencies:
 
 ```pip install -r requirements```
@@ -108,7 +115,7 @@ python3 pmpd/eval/eval.py \
     --static-search 
 ```
 
-3 answer files are generated, for 0, 85, 170 high-precision steps respectively. The best high-precision step is picked from based on custom criterion for performance. 
+3 answer files are generated, for 0, 85, 170 high-precision steps respectively. The best high-precision step is picked from based on custom criterion for performance. To evaluate the performance of each high-precision step, refer to this [section](#evaluation).
 
 #### Evaluate on CNN/DM
 
