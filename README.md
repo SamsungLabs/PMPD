@@ -115,7 +115,7 @@ python3 pmpd/eval/eval.py \
     --static-search 
 ```
 
-3 answer files are generated, for 0, 85, 170 high-precision steps respectively. The best high-precision step is picked from based on custom criterion for performance. To evaluate the performance of each high-precision step, refer to this [section](#evaluation).
+3 answer files are generated, for 0, 85, 170 high-precision steps respectively. The best high-precision step is picked based on custom criterion for performance. To evaluate the performance of each high-precision step, refer to this [section](#evaluation).
 
 #### Evaluate on CNN/DM
 
@@ -136,6 +136,8 @@ python3 pmpd/eval/eval.py \
     --kv-scheduler \
     --static-scheduler \
 ```
+
+Replace ```best-high-precision-step``` with the optimal high-precision steps (an integer) found and ```learned-classifier-path``` with the directory path of the saved learned scheduler.
 
 See [section](#evaluation) on how to evaluate the generated answer files.
 

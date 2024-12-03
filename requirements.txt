@@ -16,3 +16,5 @@ shortuuid
 torch
 tqdm
 transformers
+bert-score
+git+https://github.com/google-research/bleurt.git

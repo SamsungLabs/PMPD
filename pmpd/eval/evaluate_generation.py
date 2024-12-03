@@ -14,15 +14,10 @@ import shortuuid
 import torch
 from tqdm import tqdm
 
-from fastchat.llm_judge.common import load_questions, temperature_config
 from fastchat.model import load_model, get_conversation_template
 from fastchat.utils import str_to_torch_dtype
 
-import sys
-
-from human_eval.data import write_jsonl, read_problems
 from datasets import load_dataset
-from any_precision import AnyPrecisionForCausalLM
 from pmpd import PMPDForCausalLM, Scheduler
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
@@ -136,21 +131,6 @@ def run_eval(
 ):
     if benchname == 'mt_bench':
         questions = load_dataset('HuggingFaceH4/mt_bench_prompts', split='train').to_list()
-    elif benchname == 'humaneval':
-        questions = read_problems()
-        questions = list(questions.values())[question_begin:question_end]
-    elif benchname == 'alpaca_eval':
-        questions = load_dataset('tatsu-lab/alpaca_eval', split='eval').to_list()
-    elif benchname == 'gsm8k':
-        if use_validation:
-            questions = load_dataset('gsm8k', 'main', streaming=False, split='train')['question'][:100]
-        else:
-            questions = load_dataset('gsm8k', 'main', streaming=False, split='test')['question']
-    elif benchname == 'strategyqa':
-        if use_validation:
-            questions = load_dataset('ChilleD/StrategyQA', split='train').to_list()
-        else:
-            questions = load_dataset('ChilleD/StrategyQA', split='test').to_list()
     elif benchname == 'cnn_dm':
         if use_validation:
             dataset = load_dataset("cnn_dailymail", '3.0.0', split='validation')
@@ -158,20 +138,6 @@ def run_eval(
         else:
             dataset = load_dataset("cnn_dailymail", '3.0.0', split='test')
             questions = dataset['article'][:]
-    elif benchname == 'passkey':
-        random.seed(0)
-        if use_validation:
-            iterations = 100
-        else:
-            iterations = 100
-        questions = []
-        for i in range(iterations):
-            prompt, pass_key = generate_passkey_prompt(garbage_len=200, passkey_len=200)
-            questions.append({
-            "question_id": i,
-            "prompt": prompt,
-            "pass_key": pass_key
-            })
     elif benchname == 'IWSLT':
         if use_validation:
             dataset = load_dataset('IWSLT/iwslt2017', 'iwslt2017-en-fr', split='validation').to_list()
@@ -314,20 +280,8 @@ def get_model_answers(
         if benchname == 'mt_bench':
             question_id = question["prompt_id"]
             num_turns = len(question["prompt"])
-        elif benchname == 'humaneval':
-            question_id = question["task_id"]
-            num_turns = 1
-        elif benchname == 'alpaca_eval' or benchname == 'gsm8k':
-            question_id = i
-            num_turns = 1
-        elif benchname == 'strategyqa':
-            question_id = question["qid"]
-            num_turns = 1
         elif benchname == 'cnn_dm':
             question_id = i
-            num_turns = 1
-        elif benchname == 'passkey':
-            question_id = question["question_id"]
             num_turns = 1
         elif benchname == 'IWSLT':
             question_id = question["id"]
@@ -415,10 +369,6 @@ def get_model_answers(
                     torch.cuda.synchronize()
                     total_time = time.time() - start_time
                     if benchname == 'mt_bench':
-                        
-                        # if model.config.is_encoder_decoder:
-                        #     output_ids = output_ids[0]
-                        # else:
                         output_ids = output_ids[0][len(input_ids[0]) :]
 
                         # be consistent with the template's stop_token_ids

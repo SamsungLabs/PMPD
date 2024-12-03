@@ -7,53 +7,6 @@ import evaluate
 from collections import defaultdict
 
 
-def parse(text, part_index=-1):
-  # return the parts of the text after ASSISTANT: 
-  parts = text.split("ASSISTANT: ")
-  if len(parts) == 1:
-    parts = text.split("ASSISTANT:")
-  if len(parts) == 1:
-    parts = text.split("Assistant:")
-  if len(parts) == 1:
-    parts = text.split("[/INST]")
-  # remove </s>
-  answer = ' '.join(parts[part_index].split()).replace("</s>", "")
-  return answer
-
-
-def get_integer_string(answer):
-  # find the first continuous integer chunk in the string
-  i = 0
-  while i < len(answer) and not answer[i].isdigit():
-    i += 1
-  j = i
-  while j < len(answer) and answer[j].isdigit():
-    j += 1
-  answer = answer[i:j]
-  # print(len(answer), answer)
-  return answer
-
-# Find the length of common prefix of two strings
-def common_prefix_length(str1, str2):
-  i = 0
-  while i < len(str1) and i < len(str2) and str1[i] == str2[i]:
-    i += 1
-  return i
-
-
-def extract_integer_string(answer):
-    # remove ,
-    answer = answer.replace(',', '')
-    # Find all numeric substrings in the answer, including floating-point numbers
-    numeric_strings = re.findall(r'\-?\d+\.\d+|\-?\d+', answer)
-    if numeric_strings:
-        # Get the last numeric string and convert it to float
-        return float(numeric_strings[-1])
-    else:
-        # Return None or raise an error if no numeric string is found
-        return None
-
-
 def get_scores(input_files, bench_name, reference_data=None):
   if bench_name == "mt_bench" or bench_name == "cnn_dm" or bench_name == "dsum":
     rouge = evaluate.load("rouge")
@@ -74,14 +27,11 @@ def get_scores(input_files, bench_name, reference_data=None):
       if bench_name == "mt_bench" or bench_name == "cnn_dm" or bench_name == "IWSLT" or bench_name == "dsum":
         summaries = []
         references = []
-      elif bench_name == "passkey" or bench_name == "gsm8k":
-        correct = 0
       for i, d in enumerate(data):
         prec_dict = defaultdict(int)
         for j in range(len(d["choices"][0]["turns"])):
           answer = d["choices"][0]["turns"][j]
           if bench_name == "cnn_dm":
-            answer = parse(answer, 1)
             summaries.append(answer)
             references.append(reference_data[i])
           elif bench_name == "mt_bench":
@@ -90,17 +40,6 @@ def get_scores(input_files, bench_name, reference_data=None):
           elif bench_name == "dsum":
             summaries.append(answer)
             references.append(reference_data[i])
-          elif bench_name == "passkey":
-            answer = parse(answer, 1)
-            answer = get_integer_string(answer)
-            # print(common_prefix_length(answer, d["pass_key"]))
-            # print(answer)
-            correct += answer == d["pass_key"]
-          elif bench_name == "gsm8k":
-            n = extract_integer_string(parse(answer, 1))
-            reference_answer = extract_integer_string(reference_data[i])
-            if n is not None and (n == reference_answer or abs(float(n) - int(reference_answer)) < 1e-6):
-              correct += 1
           elif bench_name == "IWSLT":
             summaries.append(answer)
             references.append(d["reference"])
@@ -120,10 +59,6 @@ def get_scores(input_files, bench_name, reference_data=None):
         score_dict[input_file] = {
           "rougeL": rouge_score["rougeL"],
           "bert_score": sum(bert_score['f1']) / len(bert_score['f1'])
-        }
-      elif bench_name == "passkey" or bench_name == "gsm8k":
-        score_dict[input_file] = {
-          "accuracy": correct / len(data),
         }
       elif bench_name == "IWSLT":
         bleu_score = bleu.compute(predictions=summaries, references=references)
@@ -148,10 +83,6 @@ if __name__ == '__main__':
     bench_name = "mt_bench"
   elif 'cnn_dm' in input_files[0]:
     bench_name = "cnn_dm"
-  elif 'passkey' in input_files[0]:
-    bench_name = "passkey"
-  elif 'gsm8k' in input_files[0]:
-    bench_name = "gsm8k"
   elif 'IWSLT' in input_files[0]:
     bench_name = "IWSLT"
   elif 'dsum' in input_files[0]:
@@ -177,11 +108,6 @@ if __name__ == '__main__':
       reference_data = load_dataset("cnn_dailymail", "3.0.0")["validation"]["highlights"]
     else:
       reference_data = load_dataset("cnn_dailymail", "3.0.0")["test"]["highlights"]
-  elif bench_name == "gsm8k":
-    if validation:
-      reference_data = load_dataset("gsm8k", 'main')['train']['answer']
-    else:
-      reference_data = load_dataset("gsm8k", 'main')['test']['answer']
   elif bench_name == "dsum":
     if validation:
       reference_data = load_dataset('knkarthick/dialogsum', split='validation')['summary']
