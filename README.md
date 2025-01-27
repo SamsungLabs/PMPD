@@ -7,13 +7,12 @@
   </picture>
   <br>
   <div align="left" width="100%">
-  <em>Fig. 1: Conventional Quantized Decoding (left) vs Progressive Mixed-Precision Decoding (right). Our approach is motivated by i) the distinct error resilience observed during the prefill
-and decoding phases, and ii) the increasing fault tolerance as decoding progresses to later tokens in the generated sequence.</em>
+  <em>Fig. 1: Conventional Quantized Decoding (left) vs Progressive Mixed-Precision Decoding (right). Our approach is motivated by i) the distinct error resilience observed during the prefill and decoding phases, and ii) the increasing fault tolerance as decoding progresses to later tokens in the generated sequence.</em>
   </div>
   <br>
 </div>
 
-**Progressive Mixed-Precision Decoding (PMPD)** is an innovative method for optimizing large language model (LLM) execution by selectively adapting precision during inference. Our approach consists of three key techniques:
+**Progressive Mixed-Precision Decoding (PMPD)** is a novel method for optimizing large language model (LLM) execution by selectively adapting the precision of model weights during inference. Our approach consists of three key techniques:
 
 - **Phase-Aware Precision Allocation**: Adapting precision levels to the distinct traits of each LLM inference phase, PMPD applies high precision in the prefill phase and reduced precision in the decoding phase, ensuring *i)* high-quality context understanding during prefill and *ii)* improved throughput during decoding.
 - **Progressive Precision Reduction**: In the decoding phase, PMPD strategically reduces precision as the sequence of tokens is generated, optimizing hardware performance during the memory-bound decoding stage without sacrificing generation quality.
