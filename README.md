@@ -1,4 +1,54 @@
-# Phase-Aware & Progressive Mixed-Precision Decoding for Efficient LLM Inference
+# Progressive Mixed-Precision Decoding for Efficient LLM Inference
+[[paper](https://arxiv.org/abs/2410.13461)]
+
+<div align="center">
+  <picture>
+      <img src="assets/pmpd_illustration_hf.png" width="100%">
+  </picture>
+  <br>
+  <div align="left" width="100%">
+  <em>Fig. 1: Conventional Quantized Decoding (left) vs Progressive Mixed-Precision Decoding (right). Our approach is motivated by i) the distinct error resilience observed during the prefill
+and decoding phases, and ii) the increasing fault tolerance as decoding progresses to later tokens in the generated sequence.</em>
+  </div>
+  <br>
+</div>
+
+**Progressive Mixed-Precision Decoding (PMPD)** is an innovative method for optimizing large language model (LLM) execution by selectively adapting precision during inference. Our approach consists of three key techniques:
+
+- **Phase-Aware Precision Allocation**: Adapting precision levels to the distinct traits of each LLM inference phase, PMPD applies high precision in the prefill phase and reduced precision in the decoding phase, ensuring *i)* high-quality context understanding during prefill and *ii)* improved throughput during decoding.
+- **Progressive Precision Reduction**: In the decoding phase, PMPD strategically reduces precision as the sequence of tokens is generated, optimizing hardware performance during the memory-bound decoding stage without sacrificing generation quality.
+- **Flexible Precision-Switching Scheduling**: We provide two complementary schedulers: *i)* a *prompt-agnostic static scheduler* with uniform and task-optimized precision switching and *ii)* a *task-agnostic learned scheduler* with dynamic and prompt-specific precision switching. The two schedulers deliver separate trade-offs and each of them is more suitable for different settings, depending on the characterstics of the target application.
+
+PMPD builds upon the observation that the prefill phase and the initial tokens of the decoding phase are more sensitive to approximations than later tokens. By employing quantization as our approximation mechanism, we selectively reduce arithmetic precision over the course of token generation, maximizing throughput while maintaining output quality. As such, our approach pushes the performance boundary of quantized models, with increased suitability for resource-constrained environments, such edge-based and mobile devices.
+
+<div align="center">
+  <picture>
+  <img src="assets/pmpd_npu_perf_comparison.png" width="100%">
+  </picture>
+  <br>
+  <div align="center" width="100%">
+  <em>Fig. 2: End-to-end NPU throughput. Speedup is obtained in comparison to the fp16 model. See Section 5 in the paper for details on the experimental setup.</em>
+  </div>
+  <br>
+</div>
+
+
+PMPD achieves **1.4x**-**12.2x speedup** for LLM linear layer computations on GPUs, and delivers **3.8x**–**8.0x throughput gains** on an LLM-optimized NPU, outperforming traditional uniform quantization methods while preserving output quality.
+
+
+
+
+## Citation
+Our paper is available [here](https://arxiv.org/abs/2410.13461). If you found PMPD helpful or relevant to your project and research, please kindly cite our paper:
+```
+@inproceedings{hao2025pmpd,
+  title={{Progressive Mixed-Precision Decoding for Efficient LLM Inference}},
+  author={Hao (Mark) Chen and Fuwen Tan and Alexandros Kouris and Royson Lee and Hongxiang Fan and Stylianos I. Venieris},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2025},
+}
+
+```
 
 ## Contents
 
