@@ -73,7 +73,7 @@ Prerequisites:
 
 Install dependencies:
 
-```pip install -r requirements```
+```pip install -r requirements.txt```
 
 Then install the package via
 
