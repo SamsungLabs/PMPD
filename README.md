@@ -68,7 +68,7 @@ Prerequisites:
 
 - Python 3.11
 - CUDA Toolkit 12 or higher
-- gcc-9 or highe
+- gcc-9 or higher
 
 
 Install dependencies:
